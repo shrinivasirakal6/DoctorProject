@@ -9,6 +9,7 @@ public class PatientDTO {
     private String name;
     private String email;
     private String mobileNo;
+
     private String password; // usually you won’t return this in responses
 
 }

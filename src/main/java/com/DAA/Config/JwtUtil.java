@@ -13,7 +13,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "my_secret_key"; // ⚠️ Move this to application.properties in real app
+    private final String SECRET_KEY = "oiheeoihwekjjbqwdbiuqwgwdkjqjwbwduqgwibqwwd"; // ⚠️ Move this to application.properties in real app
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
     // ✅ Generate JWT token

@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -62,8 +61,6 @@ public class PatientService {
 
 
 
-        // Check if doctor is approved by Admin
-
 
         // Validate password
         if (!passwordEncoder.matches(password, patient.getPassword())) {
@@ -85,24 +82,28 @@ public class PatientService {
 
     // 2. Search by location
     public List<DoctorDTO> getDoctorsByLocation(String location) {
-        List<Doctor> doctorList = doctorRepository.findByLocationIgnoreCase(location);
+//        List<Doctor> doctorList = doctorRepository.findByLocationIgnoreCase(location);
+//        return doctorList.stream()
+//                .map(doc -> modelMapper.map(doc, DoctorDTO.class))
+//                .collect(Collectors.toList());
+        List<Doctor> doctorList = doctorRepository.searchByLocation(location);
         return doctorList.stream()
                 .map(doc -> modelMapper.map(doc, DoctorDTO.class))
                 .collect(Collectors.toList());
     }
 
-    // 3. Search doctors by availability (day + time slot)
-    public List<DoctorDTO> getDoctorsByAvailability(DayOfWeek day, LocalTime desiredStart, LocalTime desiredEnd) {
-        List<Availability> availabilities = availabilityRepository.findByDayAndIsBookedFalse(day);
-
-        List<Doctor> doctors = availabilities.stream()
-                .filter(av -> !av.getSlotStart().isAfter(desiredStart) && !av.getSlotEnd().isBefore(desiredEnd))
-                .map(Availability::getDoctor)
-                .distinct()
-                .collect(Collectors.toList());
-
-        return doctors.stream()
-                .map(doc -> modelMapper.map(doc, DoctorDTO.class))
-                .collect(Collectors.toList());
-    }
+//    // 3. Search doctors by availability (day + time slot)
+//    public List<DoctorDTO> getDoctorsByAvailability(DayOfWeek day, LocalTime desiredStart, LocalTime desiredEnd) {
+//        List<Availability> availabilities = availabilityRepository.findByDayAndIsBookedFalse(day);
+//
+//        List<Doctor> doctors = availabilities.stream()
+//                .filter(av -> !av.getSlotStart().isAfter(desiredStart) && !av.getSlotEnd().isBefore(desiredEnd))
+//                .map(Availability::getDoctor)
+//                .distinct()
+//                .collect(Collectors.toList());
+//
+//        return doctors.stream()
+//                .map(doc -> modelMapper.map(doc, DoctorDTO.class))
+//                .collect(Collectors.toList());
+//    }
 }

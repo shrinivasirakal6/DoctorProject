@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -39,9 +40,15 @@ public class Appointment {
     private LocalTime startTime;
     private LocalTime endTime;
 
+    private DayOfWeek day;
+
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status ;
+
+    @OneToOne
+    @JoinColumn(name = "availability_id")
+    private Availability availability;
 
     @Override
     public int hashCode() {

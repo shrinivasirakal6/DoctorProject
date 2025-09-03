@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -29,7 +31,7 @@ public class PatientController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> patientLogin(
-            @RequestParam LoginDTO dto
+            @RequestBody LoginDTO dto
             ){
         String token = patientService.patientLogin(dto.getEmail(), dto.getPassword());
         LoginResponse response =new LoginResponse();
@@ -45,6 +47,29 @@ public class PatientController {
         List<DoctorDTO> doctorBySpecialization = patientService.getDoctorBySpecialization(specialization);
         return new ResponseEntity<>(doctorBySpecialization,HttpStatus.OK);
     }
+
+    @GetMapping("/doctor/location/{location}")
+    public ResponseEntity<List<DoctorDTO>> getDoctorsByLocation(
+            @PathVariable String location){
+        List<DoctorDTO> doctorsByLocation = patientService.getDoctorsByLocation(location);
+        return new ResponseEntity<>(doctorsByLocation,HttpStatus.OK);
+    }
+
+
+//    @GetMapping("/doctors/available")
+//    public ResponseEntity<List<DoctorDTO>> getDoctorsByAvailability(
+//            @RequestParam String day,
+//            @RequestParam String desiredStart,
+//            @RequestParam String desiredEnd) {
+//
+//        // Convert params to proper types
+//        DayOfWeek dayOfWeek = DayOfWeek.valueOf(day.toUpperCase());
+//        LocalTime startTime = LocalTime.parse(desiredStart);
+//        LocalTime endTime = LocalTime.parse(desiredEnd);
+//
+//        List<DoctorDTO> doctors = patientService.getDoctorsByAvailability(dayOfWeek, startTime, endTime);
+//        return new ResponseEntity<>(doctors, HttpStatus.OK);
+//    }
 
 
 }

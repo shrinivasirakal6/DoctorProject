@@ -39,7 +39,7 @@ public class Doctor {
     private String experience;
     private String role; // for distinguishing roles (doctor/patient)
     private String doctorImg;
-    private Boolean validDoctor ;
+    private Boolean validDoctor;
 
     // Relationships
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)

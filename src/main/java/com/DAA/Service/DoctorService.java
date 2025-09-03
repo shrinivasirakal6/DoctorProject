@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,7 +68,7 @@ public class DoctorService {
         }
 
         // Validate password
-        if (!passwordEncoder.matches(password, doctor.getPassword())) {
+        if(!passwordEncoder.matches(password, doctor.getPassword())) {
             throw new RuntimeException("Invalid credentials!");
         }
 
@@ -74,16 +77,72 @@ public class DoctorService {
     }
 
     //doctor can add his availability
-    public AvailabilityDTO addAvailability(long doctorId,AvailabilityDTO dto){
+//    public AvailabilityDTO addAvailability(long doctorId,AvailabilityDTO dto){
+//        Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
+//                () -> new RuntimeException("Doctor with the id not found")
+//        );
+//
+//        List<Availability> overlaps = availabilityRepository.findOverlappingSlots(
+//                doctorId, dto.getDay(), dto.getSlotStart(), dto.getSlotEnd()
+//        );
+//
+//        if (!overlaps.isEmpty()) {
+//            throw new RuntimeException("Slot overlaps with an existing availability");
+//        }
+//
+//        Availability availability = modelMapper.map(dto, Availability.class);
+//        availability.setDoctor(doctor);
+//        Availability saved = availabilityRepository.save(availability);
+////        AvailabilityDTO mapped = modelMapper.map(saved, AvailabilityDTO.class);
+////        mapped.setDoctorId(doctorId);
+////        return mapped;
+//        return modelMapper.map(saved, AvailabilityDTO.class);
+//    }
+
+    public List<AvailabilityDTO> addAvailability(
+            long doctorId,AvailabilityDTO dto
+    ) {
+
+        LocalTime start=dto.getSlotStart();
+        LocalTime end = dto.getSlotEnd();
+        DayOfWeek day = dto.getDay();
+        int slotMinutes=30;
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
                 () -> new RuntimeException("Doctor with the id not found")
         );
 
-        Availability availability = modelMapper.map(dto, Availability.class);
-        availability.setDoctor(doctor);
-        Availability saved = availabilityRepository.save(availability);
-      return   modelMapper.map(saved,AvailabilityDTO.class);
+        List<AvailabilityDTO> savedDtos = new ArrayList<>();
+        LocalTime current = start;
+
+        while (current.plusMinutes(slotMinutes).compareTo(end) <= 0) {
+            LocalTime slotStart = current;
+            LocalTime slotEnd = current.plusMinutes(slotMinutes);
+
+            // check overlaps for each generated slot
+            List<Availability> overlaps = availabilityRepository.findOverlappingSlots(
+                    doctorId, day, slotStart, slotEnd
+            );
+            if (!overlaps.isEmpty()) {
+                current = current.plusMinutes(slotMinutes);
+                continue; // skip overlapping slot
+            }
+
+            Availability availability = new Availability();
+            availability.setDay(day);
+            availability.setSlotStart(slotStart);
+            availability.setSlotEnd(slotEnd);
+            availability.setDoctor(doctor);
+            availability.setIsBooked(false);
+
+            Availability saved = availabilityRepository.save(availability);
+            savedDtos.add(modelMapper.map(saved, AvailabilityDTO.class));
+
+            current = current.plusMinutes(slotMinutes);
+        }
+
+        return savedDtos;
     }
+
 
     public List<AvailabilityDTO> getAvailabilities(long doctorId){
         Doctor doctor = doctorRepository.findById(doctorId)

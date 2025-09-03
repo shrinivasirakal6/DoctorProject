@@ -34,12 +34,12 @@ public class DoctorController {
     }
 
     @PostMapping("/availability/add")
-    public ResponseEntity<AvailabilityDTO> addAvailability(
+    public ResponseEntity<List<AvailabilityDTO>> addAvailability(
             @RequestParam long doctorId,
             @RequestBody AvailabilityDTO dto
     ){
-        AvailabilityDTO availabilityDTO = doctorService.addAvailability(doctorId, dto);
-        return new ResponseEntity<>(availabilityDTO,HttpStatus.OK);
+        List<AvailabilityDTO> availabilityDTOS = doctorService.addAvailability(doctorId, dto);
+        return new ResponseEntity<>(availabilityDTOS,HttpStatus.OK);
     }
 
     @GetMapping("/availabilities")

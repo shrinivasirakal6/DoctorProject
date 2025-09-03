@@ -36,6 +36,9 @@ public class Patient {
 
     private String role; // user role
 
+    private boolean blocked = false;
+
+
     // Relationships
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

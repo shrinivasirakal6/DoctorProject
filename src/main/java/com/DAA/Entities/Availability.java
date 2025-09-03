@@ -13,6 +13,10 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @ToString
+@Table(
+        name = "availability",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"doctor_id", "day", "slot_start", "slot_end"})
+)
 public class Availability {
 
     @Id
@@ -20,11 +24,16 @@ public class Availability {
     private Long id;
 
     @Enumerated(EnumType.STRING)
+
+    @Column(name = "day")
     private DayOfWeek day;
 
+    @Column(name = "slot_start")
     private LocalTime slotStart;
+
+    @Column(name = "slot_end")
     private LocalTime slotEnd;
-    // in Availability.java
+
     @Version
     private Long version;
 

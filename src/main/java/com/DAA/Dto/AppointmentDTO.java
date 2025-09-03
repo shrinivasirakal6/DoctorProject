@@ -11,8 +11,9 @@ public class AppointmentDTO {
     private Long id;
     private Long patientId;
     private Long doctorId;
-    private LocalDate appointmentDate;
-    private LocalTime appointmentTime;
+    private LocalDateTime date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private String status; // PENDING, CONFIRMED, CANCELLED
     private LocalDateTime createdAt;
 }
