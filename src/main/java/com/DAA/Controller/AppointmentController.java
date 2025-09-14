@@ -57,4 +57,34 @@ public class AppointmentController {
         return new ResponseEntity<>(appointmentsByDoctor,HttpStatus.OK);
     }
 
+    // ---------------- UPCOMING & PAST APPOINTMENTS -------------------
+
+    // Patient upcoming
+    @GetMapping("/patient/{patientId}/upcoming")
+    public ResponseEntity<List<AppointmentDTO>> getUpcomingAppointmentsForPatient(
+            @PathVariable Long patientId) {
+        return ResponseEntity.ok(appointmentService.getUpcomingAppointmentsForPatient(patientId));
+    }
+
+    // Patient past
+    @GetMapping("/patient/{patientId}/past")
+    public ResponseEntity<List<AppointmentDTO>> getPastAppointmentsForPatient(
+            @PathVariable Long patientId) {
+        return ResponseEntity.ok(appointmentService.getPastAppointmentsForPatient(patientId));
+    }
+
+    // Doctor upcoming
+    @GetMapping("/doctor/{doctorId}/upcoming")
+    public ResponseEntity<List<AppointmentDTO>> getUpcomingAppointmentsForDoctor(
+            @PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getUpcomingAppointmentsForDoctor(doctorId));
+    }
+
+    // Doctor past
+    @GetMapping("/doctor/{doctorId}/past")
+    public ResponseEntity<List<AppointmentDTO>> getPastAppointmentsForDoctor(
+            @PathVariable Long doctorId) {
+        return ResponseEntity.ok(appointmentService.getPastAppointmentsForDoctor(doctorId));
+    }
+
 }

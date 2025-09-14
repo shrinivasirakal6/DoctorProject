@@ -24,19 +24,19 @@ import java.util.stream.Collectors;
 public class DoctorService {
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    DoctorRepository doctorRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    JwtUtil jwtUtil;
 
     @Autowired
-    private AvailabilityRepository availabilityRepository;
+    AvailabilityRepository availabilityRepository;
 
     public DoctorDTO doctorSignUp(
             DoctorDTO dto
@@ -76,28 +76,7 @@ public class DoctorService {
         return jwtUtil.generateToken(doctor.getName());
     }
 
-    //doctor can add his availability
-//    public AvailabilityDTO addAvailability(long doctorId,AvailabilityDTO dto){
-//        Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(
-//                () -> new RuntimeException("Doctor with the id not found")
-//        );
-//
-//        List<Availability> overlaps = availabilityRepository.findOverlappingSlots(
-//                doctorId, dto.getDay(), dto.getSlotStart(), dto.getSlotEnd()
-//        );
-//
-//        if (!overlaps.isEmpty()) {
-//            throw new RuntimeException("Slot overlaps with an existing availability");
-//        }
-//
-//        Availability availability = modelMapper.map(dto, Availability.class);
-//        availability.setDoctor(doctor);
-//        Availability saved = availabilityRepository.save(availability);
-////        AvailabilityDTO mapped = modelMapper.map(saved, AvailabilityDTO.class);
-////        mapped.setDoctorId(doctorId);
-////        return mapped;
-//        return modelMapper.map(saved, AvailabilityDTO.class);
-//    }
+
 
     public List<AvailabilityDTO> addAvailability(
             long doctorId,AvailabilityDTO dto
@@ -141,6 +120,44 @@ public class DoctorService {
         }
 
         return savedDtos;
+    }
+
+    // ---------------- DELETE AVAILABILITY -------------------
+    public void deleteAvailability(Long doctorId, Long availabilityId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        Availability availability = availabilityRepository.findById(availabilityId)
+                .orElseThrow(() -> new RuntimeException("Availability not found"));
+
+        // Ensure the availability belongs to the doctor
+        if (!availability.getDoctor().equals(doctor)) {
+            throw new RuntimeException("You cannot delete availability of another doctor");
+        }
+
+        // Prevent deleting if the slot is already booked
+        if (Boolean.TRUE.equals(availability.getIsBooked())) {
+            throw new RuntimeException("Cannot delete a booked availability slot");
+        }
+
+        availabilityRepository.delete(availability);
+    }
+
+
+    public DoctorDTO updateDoctorProfile(Long doctorId, DoctorDTO dto) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        doctor.setName(dto.getName());
+        doctor.setSpecialty(dto.getSpecialty());
+        doctor.setLocation(dto.getLocation());
+        doctor.setEducation(dto.getEducation());
+        doctor.setExperience(dto.getExperience());
+        doctor.setDoctorImg(dto.getDoctorImg());
+        // ...etc
+
+        Doctor updated = doctorRepository.save(doctor);
+        return modelMapper.map(updated, DoctorDTO.class);
     }
 
 

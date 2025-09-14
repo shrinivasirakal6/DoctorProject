@@ -3,41 +3,45 @@ package com.DAA.Service;
 import com.DAA.Config.JwtUtil;
 import com.DAA.Dto.DoctorDTO;
 import com.DAA.Dto.PatientDTO;
-import com.DAA.Entities.Availability;
+
+import org.springframework.data.domain.Page;       // ✅ CORRECT
+import org.springframework.data.domain.Pageable;   // ✅ CORRECT
+
 import com.DAA.Entities.Doctor;
 import com.DAA.Entities.Patient;
 import com.DAA.Repo.AvailabilityRepository;
 import com.DAA.Repo.DoctorRepository;
 import com.DAA.Repo.PatientRepository;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import java.util.List;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
 
     @Autowired
-    private PatientRepository patientRepository;
+    PatientRepository patientRepository;
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    DoctorRepository doctorRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    JwtUtil jwtUtil;
 
     @Autowired
-    private AvailabilityRepository availabilityRepository;
+    AvailabilityRepository availabilityRepository;
 
     public PatientDTO patientSignUp(
             PatientDTO dto
@@ -86,24 +90,26 @@ public class PatientService {
 //        return doctorList.stream()
 //                .map(doc -> modelMapper.map(doc, DoctorDTO.class))
 //                .collect(Collectors.toList());
-        List<Doctor> doctorList = doctorRepository.searchByLocation(location);
+        List<Doctor> doctorList = doctorRepository.findByLocation(location);
         return doctorList.stream()
                 .map(doc -> modelMapper.map(doc, DoctorDTO.class))
                 .collect(Collectors.toList());
     }
 
-//    // 3. Search doctors by availability (day + time slot)
-//    public List<DoctorDTO> getDoctorsByAvailability(DayOfWeek day, LocalTime desiredStart, LocalTime desiredEnd) {
-//        List<Availability> availabilities = availabilityRepository.findByDayAndIsBookedFalse(day);
-//
-//        List<Doctor> doctors = availabilities.stream()
-//                .filter(av -> !av.getSlotStart().isAfter(desiredStart) && !av.getSlotEnd().isBefore(desiredEnd))
-//                .map(Availability::getDoctor)
-//                .distinct()
-//                .collect(Collectors.toList());
-//
-//        return doctors.stream()
-//                .map(doc -> modelMapper.map(doc, DoctorDTO.class))
-//                .collect(Collectors.toList());
-//    }
+    // 🔹 Advanced Search
+    public Page<DoctorDTO> searchDoctors(
+            String name,
+            String specialty,
+            String location,
+            Boolean insuranceAccepted,
+            Double minRating,
+            Integer minExperience,
+            Pageable pageable) {
+
+        return doctorRepository.searchDoctors(name, specialty, location,
+                        insuranceAccepted, minRating, minExperience, pageable)
+                .map(doc -> modelMapper.map(doc, DoctorDTO.class));
+
+    }
+
 }

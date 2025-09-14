@@ -16,7 +16,6 @@ public class AvailabilityDTO {
     private LocalTime slotStart;
     private LocalTime slotEnd;
 
-
     private Boolean isBooked ;
     private long doctorId;
 }

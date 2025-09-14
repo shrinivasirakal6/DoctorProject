@@ -1,6 +1,7 @@
 package com.DAA.Dto;
 
 
+import com.DAA.Entities.AppointmentStatus;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class AppointmentDTO {
     private LocalDateTime date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private String status; // PENDING, CONFIRMED, CANCELLED
+    private AppointmentStatus status; // PENDING, CONFIRMED, CANCELLED
     private LocalDateTime createdAt;
 }
 

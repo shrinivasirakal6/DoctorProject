@@ -21,16 +21,16 @@ import java.util.stream.Collectors;
 public class AdminService {
     //write a method to approve a doctor by setting valid doctor as true
     @Autowired
-    private DoctorRepository doctorRepository;
+    DoctorRepository doctorRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     @Autowired
-    private PatientRepository patientRepository;
+    PatientRepository patientRepository;
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
+    AppointmentRepository appointmentRepository;
 
     public DoctorDTO approveDoctor(long doctorId){
         Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(

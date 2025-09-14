@@ -44,8 +44,13 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if (token != null && token.startsWith("Bearer ")) {
             String tokenVal = token.substring(7);
+
             String username = jwtService.extractUsername(tokenVal);
 
+            boolean b = jwtService.validateToken(tokenVal, username);
+            if (!b){
+                throw new RuntimeException("token expired please login again");
+            }
             // Try doctor first
             Optional<Doctor> doctorOpt = doctorRepository.findByName(username);
 
@@ -64,6 +69,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 System.out.println("✅ Authenticated Doctor: " + username);
             } else {
+
                 // Try patient (could be normal patient or admin)
                 Optional<Patient> patientOpt = patientRepository.findByName(username);
 

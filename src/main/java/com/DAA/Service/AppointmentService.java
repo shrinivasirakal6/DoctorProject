@@ -19,22 +19,22 @@ import java.util.stream.Collectors;
 public class AppointmentService {
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
+    AppointmentRepository appointmentRepository;
 
     @Autowired
-    private AvailabilityRepository availabilityRepository;
+    AvailabilityRepository availabilityRepository;
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    DoctorRepository doctorRepository;
 
     @Autowired
-    private PatientRepository patientRepository;
+    PatientRepository patientRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     @Autowired
-    private SmsService smsService;
+    SmsService smsService;
 
     // ---------------- BOOK APPOINTMENT -------------------
     @Transactional
@@ -153,5 +153,59 @@ public class AppointmentService {
                 .map(app -> modelMapper.map(app, AppointmentDTO.class))
                 .collect(Collectors.toList());
     }
+
+
+    // ---------------- UPCOMING & PAST APPOINTMENTS -------------------
+
+    public List<AppointmentDTO> getUpcomingAppointmentsForPatient(Long patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return appointmentRepository.findByPatient(patient).stream()
+                .filter(app -> app.getDate().isAfter(now) && app.getStatus() == AppointmentStatus.BOOKED)
+                .map(app -> modelMapper.map(app, AppointmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDTO> getPastAppointmentsForPatient(Long patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return appointmentRepository.findByPatient(patient).stream()
+                .filter(app -> app.getDate().isBefore(now) &&
+                        (app.getStatus() == AppointmentStatus.COMPLETED ||
+                                app.getStatus() == AppointmentStatus.CANCELLED))
+                .map(app -> modelMapper.map(app, AppointmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDTO> getUpcomingAppointmentsForDoctor(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return appointmentRepository.findByDoctorAndStatus(doctor, AppointmentStatus.BOOKED).stream()
+                .filter(app -> app.getDate().isAfter(now))
+                .map(app -> modelMapper.map(app, AppointmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<AppointmentDTO> getPastAppointmentsForDoctor(Long doctorId) {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return appointmentRepository.findByDoctorAndStatus(doctor, AppointmentStatus.COMPLETED).stream()
+                .filter(app -> app.getDate().isBefore(now))
+                .map(app -> modelMapper.map(app, AppointmentDTO.class))
+                .collect(Collectors.toList());
+    }
+
 }
 

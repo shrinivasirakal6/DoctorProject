@@ -18,19 +18,19 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     @Autowired
-    private ReviewRepository reviewRepository;
+    ReviewRepository reviewRepository;
 
     @Autowired
-    private PatientRepository patientRepository;
+    PatientRepository patientRepository;
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    DoctorRepository doctorRepository;
 
     @Autowired
-    private AppointmentRepository appointmentRepository;
+    AppointmentRepository appointmentRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
 
     // ---------------- ADD REVIEW -------------------
     public ReviewDTO addReview(Long patientId, Long doctorId, Long appointmentId, ReviewDTO dto) {

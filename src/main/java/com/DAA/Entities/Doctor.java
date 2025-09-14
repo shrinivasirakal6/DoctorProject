@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,10 @@ public class Doctor {
     private String role; // for distinguishing roles (doctor/patient)
     private String doctorImg;
     private Boolean validDoctor;
+    private String licenseNumber;
+    private String licenseDocumentPath;
+    private LocalDate licenseExpiryDate;
+
 
     // Relationships
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -6,6 +6,10 @@ import com.DAA.Dto.LoginResponse;
 import com.DAA.Dto.PatientDTO;
 import com.DAA.Service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,20 +60,30 @@ public class PatientController {
     }
 
 
-//    @GetMapping("/doctors/available")
-//    public ResponseEntity<List<DoctorDTO>> getDoctorsByAvailability(
-//            @RequestParam String day,
-//            @RequestParam String desiredStart,
-//            @RequestParam String desiredEnd) {
-//
-//        // Convert params to proper types
-//        DayOfWeek dayOfWeek = DayOfWeek.valueOf(day.toUpperCase());
-//        LocalTime startTime = LocalTime.parse(desiredStart);
-//        LocalTime endTime = LocalTime.parse(desiredEnd);
-//
-//        List<DoctorDTO> doctors = patientService.getDoctorsByAvailability(dayOfWeek, startTime, endTime);
-//        return new ResponseEntity<>(doctors, HttpStatus.OK);
-//    }
+    @GetMapping("/doctors/search")
+    public ResponseEntity<Page<DoctorDTO>> searchDoctors(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String specialty,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Boolean insuranceAccepted,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) Integer minExperience,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name,asc") String[] sort) {
+
+        // build sort object
+        String sortBy = sort[0];
+        String direction = sort.length > 1 ? sort[1] : "asc";
+        Sort sortOrder = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+
+        Page<DoctorDTO> result = patientService.searchDoctors(
+                name, specialty, location, insuranceAccepted, minRating, minExperience, pageable);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
 
 }

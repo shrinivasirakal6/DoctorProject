@@ -4,6 +4,8 @@ package com.DAA.Dto;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class DoctorDTO {
     private long doctorId;
@@ -20,6 +22,10 @@ public class DoctorDTO {
     private String experience;
     private String type; // for distinguishing roles (doctor/patient)
     private String doctorImg;
+    private String licenseNumber;
+    private String licenseDocumentPath;
+    private LocalDate licenseExpiryDate;
+
     private Boolean validDoctor ;
 }
 
